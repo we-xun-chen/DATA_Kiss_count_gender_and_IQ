@@ -1,1 +1,37 @@
+import os
+os.chdir('/content/drive/MyDrive/EN0522')  # Colab 換路徑使用
+
+import openpyxl
+wb = openpyxl.load_workbook('DATA_Kiss_count_gender_and_IQ.xlsx')     # 開啟 Excel 檔案
+
+names = wb.sheetnames    # 讀取 Excel 裡所有工作表名稱
+s1 = wb['Data']        # 取得工作表名稱為「DATA」的內容
+print(names)
+# 印出 title ( 工作表名稱 )、max_row 最大列數、max_column 最大行數
+print(s1.title, s1.max_row, s1.max_column)
+
+
+
+import pandas as pd
+import numpy as np
+
+# 讀取 Excel 檔案（假設檔名為 data.xlsx，資料在第一個 sheet）
+df = pd.read_excel('DATA_Kiss_count_gender_and_IQ.xlsx')
+
+# 讀取其中2-6欄
+data = df.iloc[:, 2:6].dropna().to_numpy()  # 去掉空值並轉成 numpy array
+
+# 確保資料數量是4的倍數（如不是可視情況補0或裁切）
+remainder = len(data) % 4
+if remainder != 0:
+    data = np.append(data, [0] * (4 - remainder))  # 補 0
+
+# 重塑成 n 行 4 列
+reshaped = data.reshape(-1, 4)
+
+# 顯示結果
+print(reshaped)
+
+
+
 
