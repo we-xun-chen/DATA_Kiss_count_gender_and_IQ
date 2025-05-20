@@ -35,3 +35,128 @@ print(reshaped)
 
 
 
+
+
+import pandas as pd
+from scipy import stats
+import numpy as np
+
+# 讀取 Excel
+df = pd.read_excel('DATA_Kiss_count_gender_and_IQ.xlsx')
+
+# 假設你要用第3~6欄
+data = df.iloc[:, 2:6]  # 第3~6欄
+
+# 對每一對變數組合計算 r、t、p
+columns = data.columns
+n = len(data.dropna())  # 有效樣本數
+
+for i in range(len(columns)):
+    for j in range(i + 1, len(columns)):
+        x = data.iloc[:, i]
+        y = data.iloc[:, j]
+
+        # 去除 NaN
+        valid = x.notna() & y.notna()
+        x = x[valid]
+        y = y[valid]
+
+        # 計算皮爾森相關係數與 p 值
+        r, p = stats.pearsonr(x, y)
+
+        # 計算 t 值：t = r * sqrt((n - 2) / (1 - r^2))
+        t = r * np.sqrt((len(x) - 2) / (1 - r**2))
+
+        print(f"{columns[i]} vs {columns[j]}: r = {r:.4f}, t = {t:.4f}, p = {p:.4g}")
+
+
+
+
+
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy import stats
+
+# 讀取 Excel
+df = pd.read_excel('DATA_Kiss_count_gender_and_IQ.xlsx')
+
+# 取第3到第6欄（Python 是從 0 開始，所以是 index 2:6）
+data = df.iloc[:, 2:6]
+
+# ==== 🔢 計算 r, t, p 值 ====
+
+# 建立儲存表
+r_matrix = data.corr(method='pearson')  # r 值
+columns = data.columns
+t_matrix = pd.DataFrame(np.zeros((len(columns), len(columns))), columns=columns, index=columns)
+p_matrix = pd.DataFrame(np.zeros((len(columns), len(columns))), columns=columns, index=columns)
+
+# 計算每對變數的 r, t, p 值
+for i in range(len(columns)):
+    for j in range(len(columns)):
+        x = data.iloc[:, i]
+        y = data.iloc[:, j]
+        valid = x.notna() & y.notna()
+        x = x[valid]
+        y = y[valid]
+
+        if len(x) > 2:
+            r, p = stats.pearsonr(x, y)
+            t = r * np.sqrt((len(x) - 2) / (1 - r**2))
+            r_matrix.iloc[i, j] = r
+            t_matrix.iloc[i, j] = t
+            p_matrix.iloc[i, j] = p
+
+# ==== 🔥 畫出相關係數熱力圖 ====
+plt.figure(figsize=(8, 6))
+sns.heatmap(r_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
+plt.title('Pearson Correlation Heatmap (r values)')
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+# ==== 📈 畫出折線圖====
+col1 = columns[0]  # 第3欄
+col2 = columns[3]  # 第6欄
+
+plt.figure(figsize=(10, 4))
+plt.plot(data[col1], label=col1, marker='o')
+plt.plot(data[col2], label=col2, marker='x')
+plt.title(f'{col1} vs {col2} - Line Chart')
+plt.xlabel('Index')
+plt.ylabel('Value')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+# ==== 📈 畫出折線圖====
+col1 = columns[1]  # 第4欄
+col2 = columns[2]  # 第5欄
+
+plt.figure(figsize=(10, 4))
+plt.plot(data[col1], label=col1, marker='o')
+plt.plot(data[col2], label=col2, marker='x')
+plt.title(f'{col1} vs {col2} - Line Chart')
+plt.xlabel('Index')
+plt.ylabel('Value')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
